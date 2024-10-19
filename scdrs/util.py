@@ -87,7 +87,7 @@ def load_h5ad(
         sc.pp.filter_cells(adata, min_genes=min_genes)
         sc.pp.filter_genes(adata, min_cells=min_cells)
     if flag_raw_count:
-        sc.pp.normalize_per_cell(adata, counts_per_cell_after=1e4)
+        sc.pp.normalize_total(adata, target_sum=1e4)
         sc.pp.log1p(adata)
     return adata
 
