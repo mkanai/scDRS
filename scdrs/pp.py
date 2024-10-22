@@ -40,7 +40,7 @@ def category2dummy(
     dummy_dfs = []
     for col in cols:
         # create df of dummy variables
-        dummy_df = pd.get_dummies(df[col], drop_first=True)
+        dummy_df = pd.get_dummies(df[col], drop_first=True, dtype=np.int32)
         dummy_df.columns = [f"{col}_{s}" for s in dummy_df.columns]
         dummy_df.loc[df[col].isnull(), dummy_df.columns] = np.nan
         cols_to_drop.append(col)
