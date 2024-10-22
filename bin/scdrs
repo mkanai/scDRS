@@ -280,12 +280,22 @@ def compute_score(
             compression="gzip",
         )
         if FLAG_RETURN_CTRL_RAW_SCORE | FLAG_RETURN_CTRL_NORM_SCORE:
-            df_res.to_csv(
-                os.path.join(OUT_FOLDER, "%s.full_score.gz" % trait),
-                sep="\t",
-                index=True,
-                compression="gzip",
-            )
+            try:
+                import polars as pl
+
+                pl.from_pandas(df_res.reset_index()).write_csv(
+                    os.path.join(OUT_FOLDER, "%s.full_score.gz" % trait),
+                    separator="\t",
+                    include_header=True,
+                    compression="gzip"
+                )
+            except ImportError:
+                df_res.to_csv(
+                    os.path.join(OUT_FOLDER, "%s.full_score.gz" % trait),
+                    sep="\t",
+                    index=True,
+                    compression="gzip",
+                )
         v_fdr = multipletests(df_res["pval"].values, method="fdr_bh")[1]
         n_rej_01 = (v_fdr < 0.1).sum()
         n_rej_02 = (v_fdr < 0.2).sum()
