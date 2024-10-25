@@ -97,13 +97,13 @@ def load_scdrs_score(
 ) -> Dict[str, pd.DataFrame]:
     """Load scDRS scores.
 
-    Use "@" to specify multiple files, e.g., `score_folder/@.full_score.gz`
+    Use "@" to specify multiple files, e.g., `score_folder/@.full_score.feather`
 
     Parameters
     ----------
     score_file : str
-        Path to scDRS `.full_score.gz` file. Use '@' to specify multiple file names,
-        e.g., `score_folder/@.full_score.gz`. However, `score_folder` should
+        Path to scDRS `.full_score.feather` file. Use '@' to specify multiple file names,
+        e.g., `score_folder/@.full_score.feather`. However, `score_folder` should
         not contain '@'.
     obs_names : List[str]
         Expected list of cells. Score files with less than 10% overlap with this list
@@ -115,8 +115,8 @@ def load_scdrs_score(
         Dictionary of scDRS full score DataFrames, keyed by trait name.
     """
     assert score_file.endswith(
-        "full_score.gz"
-    ), "Expect scDRS .full_score.gz files for score_file"
+        "full_score.feather"
+    ), "Expect scDRS .full_score.feather files for score_file"
 
     # Get score_dir and score_file_list for potentially multiple score files
     score_file_pattern = score_file.split(os.path.sep)[-1]
@@ -131,9 +131,7 @@ def load_scdrs_score(
 
     dict_score = {}
     for score_file in score_file_list:
-        temp_df = pd.read_csv(
-            score_dir + os.path.sep + score_file, sep="\t", index_col=0
-        )
+        temp_df = pd.read_feather(score_dir + os.path.sep + score_file)
         temp_df.index = [str(x) for x in temp_df.index]
         if obs_names is not None:
             # Check overlap of cells between score_file and obs_names
@@ -144,7 +142,7 @@ def load_scdrs_score(
                     % (score_file, n_cell_overlap, len(obs_names))
                 )
                 continue
-        dict_score[score_file.replace(".full_score.gz", "")] = temp_df.copy()
+        dict_score[score_file.replace(".full_score.feather", "")] = temp_df.copy()
 
     return dict_score
 

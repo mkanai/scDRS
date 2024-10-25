@@ -41,7 +41,7 @@ def compute_score(
     flag_return_ctrl_norm_score: bool = True,
 ):
     """
-    Compute scDRS scores. Generate `.score.gz` and `.full_score.gz` files for each trait.
+    Compute scDRS scores. Generate `.score.gz` and `.full_score.feather` files for each trait.
 
     Parameters
     ----------
@@ -55,7 +55,7 @@ def compute_score(
         Species of the gs file. One of "hsapiens", "human", "mmusculus", or "mouse".
     out_folder : str
         Output folder. Save scDRS score files as `<out_folder>/<trait>.score.gz` and
-        scDRS full score files as `<out_folder>/<trait>.full_score.gz`, where trait 
+        scDRS full score files as `<out_folder>/<trait>.full_score.feather`, where trait
         identifier <trait> is from gs_file file.
     cov_file : str, optional
         scDRS covariate .cov file. Default is None.
@@ -280,12 +280,7 @@ def compute_score(
             compression="gzip",
         )
         if FLAG_RETURN_CTRL_RAW_SCORE | FLAG_RETURN_CTRL_NORM_SCORE:
-            df_res.to_csv(
-                os.path.join(OUT_FOLDER, "%s.full_score.gz" % trait),
-                sep="\t",
-                index=True,
-                compression="gzip",
-            )
+            df_res.to_feather(os.path.join(OUT_FOLDER, "%s.full_score.feather" % trait))
         v_fdr = multipletests(df_res["pval"].values, method="fdr_bh")[1]
         n_rej_01 = (v_fdr < 0.1).sum()
         n_rej_02 = (v_fdr < 0.2).sum()
@@ -570,7 +565,7 @@ def perform_downstream(
     knn_n_pcs: int = 20,
 ):
     """
-    Perform scDRS downstream analyses based on precomputed scDRS `.full_score.gz` files.
+    Perform scDRS downstream analyses based on precomputed scDRS `.full_score.feather` files.
     
     --group-analysis
         For a given cell-group-level annotation (e.g., tissue or cell type), assess cell 
@@ -590,8 +585,8 @@ def perform_downstream(
     h5ad_file : str
         Single-cell .h5ad file.
     score_file : str
-        scDRS .full_score.gz file. Use “@” to specify multiple file names, e.g.,
-        <score_folder>/@.full_score.gz. However, <score_folder> should not contain “@”.
+        scDRS .full_score.feather file. Use “@” to specify multiple file names, e.g.,
+        <score_folder>/@.full_score.feather. However, <score_folder> should not contain “@”.
     out_folder : str
         Output folder.
     group_analysis : str, optional
