@@ -146,7 +146,7 @@ def test_downstream_cli():
     # Load toy data
     ROOT_DIR = scdrs.__path__[0]
     H5AD_FILE = os.path.join(ROOT_DIR, "data/toydata_mouse.h5ad")
-    SCORE_FILE = os.path.join(ROOT_DIR, "data/@.full_score.gz")
+    SCORE_FILE = os.path.join(ROOT_DIR, "data/@.full_score.feather")
     REF_RES_DIR = os.path.join(ROOT_DIR, "data/")
 
     tmp_dir = tempfile.TemporaryDirectory()
